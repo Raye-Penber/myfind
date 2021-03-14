@@ -40,15 +40,15 @@ typedef struct param_node {
     struct param_node* next;
 } ParameterNode;
 
+Parameter* createParameter(const char* name, const char* value);
 ParameterNode* parseParams(int argc, char* argv[], char* path);
+ParameterNode* appendParameter(ParameterNode* head, Parameter* param);
 bool typeExists(const char* type);
 void verifyArgument(int argc, char* argv[], int index);
 void exitOnNull(Parameter* param, const char* paramName);
 void* allocateMemory(size_t size);
 bool stringStartsWith(const char *pre, const char *str);
 bool isNumeric(const char* str);
-Parameter* createParameter(const char* name, const char* value);
-ParameterNode* appendParameter(ParameterNode* head, Parameter* param);
 void doEntry(const char* entry_name, ParameterNode* params);
 void doDirectory(const char* dir_name, ParameterNode* params);
 char* getFilePermissions(mode_t mode);
