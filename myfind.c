@@ -1,13 +1,10 @@
-
-/// This file implements a more simple version of the 'find' function found in *NIX - systems.
-/// Providable parameters are:
-/// -user:   finds directory entries of a specified user
-/// -name:   finds directory entries matching a specified name
-/// -type:   finds directory entries with a matching file type
-/// -print:  prints the name of a directory entry
-/// -ls:     prints in typical 'ls' command fashion.
-/// -nouser: finds directory entries without a user.
-/// -path:   finds directory entries with matching path (name included)
+/*This is a simplified implementation of the Linux command "find".
+Possible parameters are:
+-user       finds directory entries of a given user
+-name       finds directory entries with a file name matching the supplied pattern
+-type       finds directory entries of a given type
+-print      prints the name of the directory to stdout
+-ls         similiar to -ls command in CLI*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -118,14 +115,14 @@ ParameterNode* parseParams(int argc, char* argv[], char* path) {
                 appendParameter(head, lsParam);
                 outputSet = true;
             } else {
-                fprintf(stderr, "%s is not a valid command.", argv[i]);
+                fprintf(stderr, "%s is not a valid command.\n", argv[i]);
                 exit(EXIT_FAILURE);
             }
         } else {
             if(i == 1) {
                 strncpy(path, argv[i], MAXPATHLENGTH);
             } else {
-                fprintf(stderr, "%s is not a valid command.", argv[i]);
+                fprintf(stderr, "%s is not a valid command.\n", argv[i]);
                 exit(EXIT_FAILURE);
             }
         }
@@ -205,7 +202,7 @@ bool typeExists(const char* type) {
 /// behaviour of command line program calls.
 void exitOnNull(Parameter* param, const char* paramName) {
     if (param == NULL) {
-        fprintf(stderr, "Parameter %s could not be parsed.", paramName);
+        fprintf(stderr, "Parameter %s could not be parsed.\n", paramName);
         exit(EXIT_FAILURE);
     }
 }
@@ -267,18 +264,13 @@ void doEntry(const char* entry_name, ParameterNode* params) {
     bool flag = true;
 
     while((current != NULL) && flag) {
-
-        if(strcmp(current->param->name, "-path") == 0) {
-            flag &= matchPath(current->param->value, entry_name);
-        }
-
         if(stat(entry_name, fi) != 0) {
             switch (errno) {
                 case EACCES:
-                    fprintf(stdout, "stat(\"%s\") failed", entry_name);
+                    fprintf(stdout, "stat(\"%s\") failed.\n", entry_name);
                     break;
                 default:
-                    error(EXIT_FAILURE, errno, "stat(\"%s\") failed", entry_name);
+                    error(EXIT_FAILURE, errno, "stat(\"%s\") failed.\n", entry_name);
                     break;
             }
         }
@@ -293,8 +285,6 @@ void doEntry(const char* entry_name, ParameterNode* params) {
             flag &= compType(fi, current->param->value[0]);
         } else if(strcmp(current->param->name, "-name") == 0) {
             flag &= compPath(current->param->value, entry_name);
-        } else if(strcmp(current->param->name, "-nouser") == 0) {
-            flag &= hasNoUser(fi);
         }
 
         current = current->next;
@@ -315,9 +305,9 @@ void doDirectory(const char* dir_name, ParameterNode* params){
     if(dir == NULL) {
         switch(errno) {
             case EACCES:
-                fprintf(stdout, "opendir(%s) failed", dir_name);
+                fprintf(stdout, "opendir(%s) failed.\n", dir_name);
                 break;
-            default: error(EXIT_FAILURE, errno, "opendir(%s) failed", dir_name);
+            default: error(EXIT_FAILURE, errno, "opendir(%s) failed.\n", dir_name);
         }
     }
 
@@ -398,7 +388,7 @@ void concatPath(char* dest, const char* arg1, const char* arg2) {
     int pathLength = snprintf(dest, MAXPATHLENGTH, "%s/%s", arg1, arg2);
 
     if(pathLength >= MAXPATHLENGTH) {
-        error(EXIT_FAILURE, errno, "Maximum path length exceeded.\\n\"");
+        error(EXIT_FAILURE, errno, "Maximum path length exceeded.\n");
     }
 }
 
@@ -408,7 +398,7 @@ bool compUser(const FileInfo* fi, const char* user) {
 
     if(isNumeric(user) == true && strlen(user) < 19) {
         if(strtol(user, NULL, 10) == 0) {
-            error(EXIT_FAILURE, 1, "Failed converting user ID.");
+            error(EXIT_FAILURE, 1, "Failed converting user ID.\n");
         }
 
         return fi->st_uid == userId;
@@ -419,7 +409,7 @@ bool compUser(const FileInfo* fi, const char* user) {
     struct passwd* pwd_user = getpwnam(user);
 
     if (pwd_user == NULL) {
-        error(EXIT_FAILURE, errno, "User does not exist");
+        error(EXIT_FAILURE, errno, "User does not exist.\n");
     }
 
     return fi->st_uid == pwd_user->pw_uid;
