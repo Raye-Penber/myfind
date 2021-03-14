@@ -1,10 +1,10 @@
-/*This is a simplified implementation of the Linux command "find".
+/* This is a simplified implementation of the Linux command "find".
 Possible parameters are:
 -user       finds directory entries of a given user
 -name       finds directory entries with a file name matching the supplied pattern
 -type       finds directory entries of a given type
 -print      prints the name of the directory to stdout
--ls         similiar to -ls command in CLI*/
+-ls         similiar to -ls command in CLI */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -59,7 +59,6 @@ bool compType(const FileInfo* fileInfo, char type);
 bool hasNoUser(const FileInfo* fileInfo);
 
 int main(int argc, char* argv[]) {
-
     char* path = (char*)allocateMemory(sizeof(char) * MAXPATHLENGTH);
     ParameterNode* params = parseParams(argc, argv, path);
 
@@ -68,7 +67,7 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
-//Checks argc and argv for used parameters
+// Checks argc and argv for used parameters
 ParameterNode* parseParams(int argc, char* argv[], char* path) {
     ParameterNode* head = (ParameterNode*)malloc(sizeof(ParameterNode));
 
@@ -134,7 +133,7 @@ ParameterNode* parseParams(int argc, char* argv[], char* path) {
     return head;
 }
 
-//Checks if an argument that needs a variable has one
+// Checks if an argument that needs a variable has one
 void verifyArgument(int argc, char* argv[], int index) {
     if((index + 1) >= argc) {
         fprintf(stderr, "No argument provided for %s.\n", argv[index]);
@@ -142,7 +141,7 @@ void verifyArgument(int argc, char* argv[], int index) {
     }
 }
 
-//Checks if a user exists in user database
+// Checks if a user exists in user database
 bool userExists(const char* username, unsigned int* userId) {
     struct passwd* user = getpwnam(username);
 
@@ -153,7 +152,7 @@ bool userExists(const char* username, unsigned int* userId) {
     return true;
 }
 
-//Checks if a userID exists in user database
+// Checks if a userID exists in user database
 bool userIdExists(unsigned int userId) {
     struct passwd* user = getpwuid(userId);
 
@@ -163,7 +162,7 @@ bool userIdExists(unsigned int userId) {
     return true;
 }
 
-//Checks if a group exists in the group database
+// Checks if a group exists in the group database
 bool groupExists(const char* groupName) {
     struct group* grp = getgrnam(groupName);
 
@@ -173,7 +172,7 @@ bool groupExists(const char* groupName) {
     return true;
 }
 
-//Checks if a groupID exists in the group database
+// Checks if a groupID exists in the group database
 bool groupIdExists(unsigned int groupId) {
     struct group* grp = getgrgid(groupId);
 
@@ -183,7 +182,7 @@ bool groupIdExists(unsigned int groupId) {
     return true;
 }
 
-//Checks if a given type is allowed
+// Checks if a given type is allowed
 bool typeExists(const char* type) {
     static char allowedTypes[7] = {'b', 'c', 'd', 'p', 'f', 'l', 's'};
 
@@ -195,11 +194,7 @@ bool typeExists(const char* type) {
     return false;
 }
 
-/// This function throws an error if a parameter can not be parsed
-/// and terminated the program.
-/// If a non - parsable parameter is found, the program call is faulty,
-/// so the program needs to be terminated. This mirrors the standard
-/// behaviour of command line program calls.
+// Checks if a paramater could not be parsed
 void exitOnNull(Parameter* param, const char* paramName) {
     if (param == NULL) {
         fprintf(stderr, "Parameter %s could not be parsed.\n", paramName);
@@ -207,7 +202,7 @@ void exitOnNull(Parameter* param, const char* paramName) {
     }
 }
 
-//Appends a paramater to the parameter linked list
+// Appends a paramater node to the parameter linked list
 ParameterNode* appendParameter(ParameterNode* head, Parameter* param) {
     if(head == NULL || param  == NULL) {
         return NULL;
@@ -232,10 +227,7 @@ ParameterNode* appendParameter(ParameterNode* head, Parameter* param) {
     return head;
 }
 
-/// This function creates and instantiates a new parameter variable with a name and a value.
-/// If no name is given, the function returns NULL.
-/// If a name is and a value is not given, a new parameter with a name only is created.
-/// If name and value is given, a new parameter with a name and a value is created.
+// Creates a new parameter node with given parameters
 Parameter* createParameter(const char* name, const char* value) {
     if(name == NULL) {
         return NULL;
@@ -254,7 +246,7 @@ Parameter* createParameter(const char* name, const char* value) {
     return param;
 }
 
-//Called for every entry to be tested
+// Called for every entry to be tested
 void doEntry(const char* entry_name, ParameterNode* params) {
     FileInfo* fi = (FileInfo*)allocateMemory(sizeof(FileInfo));
 
@@ -297,7 +289,7 @@ void doEntry(const char* entry_name, ParameterNode* params) {
     free(fi);
 }
 
-//Called for every directory to be tested
+// Called for every directory to be tested
 void doDirectory(const char* dir_name, ParameterNode* params){
     errno = 0;
     DIR* dir = opendir(dir_name);
@@ -322,7 +314,7 @@ void doDirectory(const char* dir_name, ParameterNode* params){
     }
 }
 
-//Recreates functionality of "ls" command on CLI
+// Recreates functionality of "ls" command on CLI
 void printLs(const char* path, FileInfo* fileInfo) {
     char timeStrBuff[13];
     time_t time = fileInfo->st_mtim.tv_sec;
@@ -359,12 +351,12 @@ void printLs(const char* path, FileInfo* fileInfo) {
     printf("\n");
 }
 
-//Prints a path
+// Prints a path
 void printPath(const char* path) {
     fprintf(stdout, "%s\n", path);
 }
 
-//Returns file permissions through mode_t flags
+// Returns file permissions through mode_t flags
 char* getFilePermissions(mode_t mode) {
     char* bits = malloc(sizeof(char) * 11);
 
@@ -383,7 +375,7 @@ char* getFilePermissions(mode_t mode) {
     return bits;
 }
 
-//Concatenates two strings and adds a '/' between them
+// Concatenates two strings and adds a '/' between them
 void concatPath(char* dest, const char* arg1, const char* arg2) {
     int pathLength = snprintf(dest, MAXPATHLENGTH, "%s/%s", arg1, arg2);
 
@@ -392,7 +384,7 @@ void concatPath(char* dest, const char* arg1, const char* arg2) {
     }
 }
 
-//Checks if a user matches with the user of the provided file
+// Checks if a user matches with the user of the provided file
 bool compUser(const FileInfo* fi, const char* user) {
     long userId = -1;
 
@@ -415,7 +407,7 @@ bool compUser(const FileInfo* fi, const char* user) {
     return fi->st_uid == pwd_user->pw_uid;
 }
 
-//Matches a file name against a pattern
+// Matches a file name against a pattern
 bool compPath(const char* name, const char* path) {
     char* buff = strdup(path);
     char* extractedFileName = basename(buff);
@@ -423,19 +415,19 @@ bool compPath(const char* name, const char* path) {
     return fnmatch(name, extractedFileName, FNM_NOESCAPE ) != FNM_NOMATCH;
 }
 
-//Matches a path against a pattern
+// Matches a path against a pattern
 bool matchPath(const char* pattern, const char* path) {
     return fnmatch(pattern, path, FNM_NOESCAPE) != FNM_NOMATCH;
 }
 
-//Checks type of a file
-//S_ISREG() - regular file
-//S_ISDIR() - directory
-//S_ISCHR() - character file
-//S_ISBLK() - block file
-//S_ISFIFO() - FIFO
-//S_ISLINK() - symbolic link
-//S_ISSOCK() - socket
+/* Checks type of a file
+S_ISREG() - regular file
+S_ISDIR() - directory
+S_ISCHR() - character file
+S_ISBLK() - block file
+S_ISFIFO() - FIFO
+S_ISLINK() - symbolic link
+S_ISSOCK() - socket */
 bool compType(const FileInfo* fileInfo, char type) {
     mode_t fileType = fileInfo->st_mode;
 
@@ -459,12 +451,12 @@ bool compType(const FileInfo* fileInfo, char type) {
     }
 }
 
-//Checks if a file has a user
+// Checks if a file has a user
 bool hasNoUser(const FileInfo* fileInfo) {
     return getpwuid(fileInfo->st_uid) == NULL;
 }
 
-//Checks if malloc was successful
+// Checks if malloc was successful
 void* allocateMemory(size_t size) {
     void* ptr = malloc(size);
 
@@ -475,12 +467,12 @@ void* allocateMemory(size_t size) {
     return ptr;
 }
 
-//Checks if a string starts with a given string; eg.: pre = '-', str = '-type' -> TRUE
+// Checks if a string starts with a given string; eg.: pre = '-', str = '-type' -> TRUE
 bool stringStartsWith(const char *pre, const char *str) {
     return strncmp(pre, str, strlen(pre)) == 0;
 }
 
-//Checks if a string contains only numbers
+// Checks if a string contains only numbers
 bool isNumeric(const char* str) {
     if(str == NULL) return false;
 
