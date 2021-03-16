@@ -32,9 +32,9 @@ typedef struct parameter {
     char* value;
 } Parameter;
 
-typedef struct param_node {
+typedef struct parameterNode {
     Parameter* param;
-    struct param_node* next;
+    struct parameterNode* next;
 } ParameterNode;
 
 Parameter* createParameter(const char* name, const char* value);
